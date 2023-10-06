@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
                     }
                 } else {
                     if (var > 0){
-                        G2 << var << " ";
+                        G2 << var-v << " ";
                     }
                 }
                 x+=1;
