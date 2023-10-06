@@ -15,14 +15,17 @@ Code, Compile, Run and Debug online from anywhere in world.
 #include "MiniSAT.hpp"
 using namespace std;
 
-int main()
+int main(int argc, char* argv[])
 {
-    cout<<"Hello World\n";
-    
-    string inputfilename ("test.graph");
-    string satfilename ("test.satinput");
+    if (argc != 3) {
+        cerr << "Usage: " << argv[0] << " <argument1> <argument2>" << endl;
+        return 1;
+    }
+    string inputfilename = argv[1];
+    string satfilename = argv[2];
+    // string inputfilename ("test.graph");
+    // string satfilename ("test.satinput");
     MiniSAT *allotment = new MiniSAT(inputfilename, satfilename);
-    
     return 0;
 }
 

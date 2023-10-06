@@ -22,4 +22,5 @@ class MiniSAT {
     void buildGraph();
     void writeCNFtoFile(string filename);
     string constraintOne();
+    string constrainttwo();
 };

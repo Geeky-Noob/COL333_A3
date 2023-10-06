@@ -45,8 +45,6 @@ void MiniSAT::readInInputFile(string inputfilename) {
         ipfile >> k1;
         ipfile >> k2;
         
-        // vector<pair<int, int>> tempEdges;
-        
         int u,v;
         
         for (int i=1; i <= no_edges; i++) {
@@ -77,8 +75,21 @@ string MiniSAT::constraintOne() {
     return cnf.str();
 }
 
+string MiniSAT::constrainttwo() {
+    stringstream cnf;
+    for (int i = 1; i <= no_vertices; ++i) {
+        for (int neighbour : graph[i]){
+            cnf << "-" << i << " " <<  neighbour << " 0\n";
+            cnf << "-" << (i + no_vertices) << " " <<  (neighbour + no_vertices) << " 0\n";
+        }
+    }
+    return cnf.str();
+}
+
 void MiniSAT::writeCNFtoFile(string filename) {
-    string cnfFormula = constraintOne();
+    string cnf1 = constraintOne();
+    string cnf2 = constrainttwo();
+    string cnfFormula = cnf1 + cnf2;
     cout << "CNF:\n" << cnfFormula << endl;
     ofstream satInputFile(filename);
     if (!satInputFile.is_open()) {
