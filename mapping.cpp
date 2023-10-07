@@ -72,10 +72,15 @@ int main(int argc, char* argv[])
         cerr << "Failed to open the file for writing." << endl;
         exit(0);
     }
-    mappingFile << "#1 \n";
-    mappingFile << G1.str();
-    mappingFile << "#2 \n";
-    mappingFile << G2.str();
+    if (sat=="SAT"){
+        mappingFile << "#1 \n";
+        mappingFile << G1.str();
+        mappingFile << "#2 \n";
+        mappingFile << G2.str();
+    } else {
+        mappingFile << "0 \n";
+    }
+    
     mappingFile.close();
 
     return 0;
