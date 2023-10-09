@@ -6,26 +6,6 @@
 
 using namespace std;
 
-// vector<int> getG1Nodes() {
-//     vector<int> g1Nodes;
-//     for (int i = 1; i <= no_vertices; ++i) {
-//         if (assignments[i] && g1Nodes.size() < k1) {
-//             g1Nodes.push_back(i);
-//         }
-//     }
-//     return g1Nodes;
-// }
-
-// vector<int> getG2Nodes() {
-//     vector<int> g2Nodes;
-//     for (int i = no_vertices+1; i <= 2*no_vertices; ++i) {
-//         if (assignments[i] && g2Nodes.size() < k2) {
-//             g2Nodes.push_back(i-no_vertices);
-//         }
-//     }
-//     return g2Nodes;
-// }
-
 int main(int argc, char* argv[])
 {
     if (argc != 4) {
@@ -62,14 +42,18 @@ int main(int argc, char* argv[])
     } else {
         ipfile >> sat;
         x = 1;
+        int c1 = 1;
+        int c2 = 1;
         if (sat=="SAT"){
             while (ipfile >> var && var<=2*v) {
                 if (x<=v){
-                    if (var > 0){
+                    if (var > 0 && c1<=k1){
+                        c1++;
                         G1 << var << " ";
                     }
                 } else {
-                    if (var > 0){
+                    if (var > 0 && c2<=k2){
+                        c2++;
                         G2 << var-v << " ";
                     }
                 }
