@@ -23,4 +23,5 @@ class MiniSAT {
     void writeCNFtoFile(string filename);
     string constraintOne();
     string constrainttwo();
+    string constraintthree();
 };

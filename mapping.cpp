@@ -6,6 +6,26 @@
 
 using namespace std;
 
+// vector<int> getG1Nodes() {
+//     vector<int> g1Nodes;
+//     for (int i = 1; i <= no_vertices; ++i) {
+//         if (assignments[i] && g1Nodes.size() < k1) {
+//             g1Nodes.push_back(i);
+//         }
+//     }
+//     return g1Nodes;
+// }
+
+// vector<int> getG2Nodes() {
+//     vector<int> g2Nodes;
+//     for (int i = no_vertices+1; i <= 2*no_vertices; ++i) {
+//         if (assignments[i] && g2Nodes.size() < k2) {
+//             g2Nodes.push_back(i-no_vertices);
+//         }
+//     }
+//     return g2Nodes;
+// }
+
 int main(int argc, char* argv[])
 {
     if (argc != 4) {
@@ -41,14 +61,11 @@ int main(int argc, char* argv[])
         exit( 0 );
     } else {
         ipfile >> sat;
-        x = 0;
+        x = 1;
         if (sat=="SAT"){
-            while (ipfile >> var && var!=0) {
-                cout << "var : " <<var << endl;
-                if (x<v){
+            while (ipfile >> var && var<=2*v) {
+                if (x<=v){
                     if (var > 0){
-                        cout << "var: "<< var << endl;
-                        cout << G1.str() <<endl;
                         G1 << var << " ";
                     }
                 } else {
@@ -63,8 +80,6 @@ int main(int argc, char* argv[])
     }
     G1 << " \n";
     G2 << " \n";
-    cout << "G1: " << G1.str() << endl;
-    cout << "G2: " << G2.str() << endl;
 
     // write in mapping file
     ofstream mappingFile(mapping_file);
