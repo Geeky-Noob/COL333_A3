@@ -77,28 +77,48 @@ string MiniSAT::constraintOne() {
 
 string MiniSAT::constrainttwo() {
     stringstream cnf;
-    int start = no_vertices*(2*no_vertices-k1-k2+2);
     for (int i = 1; i <= no_vertices; ++i) {
         for (int j = 1; j <= no_vertices; ++j) {
+
             if (i != j) {
                 bool connected = false;
                 for (int neighbour : graph[i]){
                     if (neighbour == j){
-                        cnf << start + (i-1)*no_vertices + neighbour << " 0\n";
                         connected = true;
                         break;
                     } 
                 }
+
                 if (!connected) {
-                    cnf << "-" << start + (i-1)*no_vertices + j << " 0\n";
+            
+                    cnf << "-" << i << " -" <<  j << " 0\n";
+                    cnf << "-" << (i + no_vertices) << " -" <<  (j + no_vertices) << " 0\n";
                 }
-                cnf << "-" << i << " -" << j << " " << start + (i-1)*no_vertices + j << " 0\n";
-                cnf << "-" << (i+no_vertices) << " -" << (j+no_vertices) << " " << start + (i-1)*no_vertices + j << " 0\n";
-            } else {
-                cnf << "-" << start + (i-1)*no_vertices + j << " 0\n";
             }
         }
-    }
+    }    
+    // int start = no_vertices*(2*no_vertices-k1-k2+2);
+    // for (int i = 1; i <= no_vertices; ++i) {
+    //     for (int j = 1; j <= no_vertices; ++j) {
+    //         if (i != j) {
+    //             bool connected = false;
+    //             for (int neighbour : graph[i]){
+    //                 if (neighbour == j){
+    //                     cnf << start + (i-1)*no_vertices + neighbour << " 0\n";
+    //                     connected = true;
+    //                     break;
+    //                 } 
+    //             }
+    //             if (!connected) {
+    //                 cnf << "-" << start + (i-1)*no_vertices + j << " 0\n";
+    //             }
+    //             cnf << "-" << i << " -" << j << " " << start + (i-1)*no_vertices + j << " 0\n";
+    //             cnf << "-" << (i+no_vertices) << " -" << (j+no_vertices) << " " << start + (i-1)*no_vertices + j << " 0\n";
+    //         } else {
+    //             cnf << "-" << start + (i-1)*no_vertices + j << " 0\n";
+    //         }
+    //     }
+    // }
     return cnf.str();
 }
 
@@ -184,7 +204,7 @@ void MiniSAT::writeCNFtoFile(string filename) {
     string cnf2 = constrainttwo();
     string cnf3 = constraintthree();
     string cnfFormula = cnf1 + cnf2 + cnf3;
-    cout << "CNF:\n" << cnfFormula << endl;
+    // cout << "CNF:\n" << cnfFormula << endl;
     ofstream satInputFile(filename);
     if (!satInputFile.is_open()) {
         cerr << "Failed to open the file for writing." << std::endl;
