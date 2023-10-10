@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -66,13 +65,19 @@ void MiniSAT::buildGraph() {  // adjacency list
 
 string MiniSAT::constraintOne() {
     stringstream cnf;
+    stringstream s1,s2;
     for (int i = 1; i <= no_vertices; ++i) {
         cnf << "-" << i << " -" << (i + no_vertices) << " 0\n";
+        if (k1 > 0) {
+            s1 << i <<" ";
+        }
+        if (k2 > 0) {
+            s2 << (i+no_vertices) <<" ";
+        }   
     }
-    // for (int i = 1; i <= no_vertices; ++i) {
-    //     cnf << i << " " << (i + no_vertices) << " 0\n";
-    // }
-    return cnf.str();
+    s1 << "0\n";
+    s2 << "0\n";
+    return cnf.str()+s1.str()+s2.str();
 }
 
 string MiniSAT::constrainttwo() {
@@ -96,29 +101,7 @@ string MiniSAT::constrainttwo() {
                 }
             }
         }
-    }    
-    // int start = no_vertices*(2*no_vertices-k1-k2+2);
-    // for (int i = 1; i <= no_vertices; ++i) {
-    //     for (int j = 1; j <= no_vertices; ++j) {
-    //         if (i != j) {
-    //             bool connected = false;
-    //             for (int neighbour : graph[i]){
-    //                 if (neighbour == j){
-    //                     cnf << start + (i-1)*no_vertices + neighbour << " 0\n";
-    //                     connected = true;
-    //                     break;
-    //                 } 
-    //             }
-    //             if (!connected) {
-    //                 cnf << "-" << start + (i-1)*no_vertices + j << " 0\n";
-    //             }
-    //             cnf << "-" << i << " -" << j << " " << start + (i-1)*no_vertices + j << " 0\n";
-    //             cnf << "-" << (i+no_vertices) << " -" << (j+no_vertices) << " " << start + (i-1)*no_vertices + j << " 0\n";
-    //         } else {
-    //             cnf << "-" << start + (i-1)*no_vertices + j << " 0\n";
-    //         }
-    //     }
-    // }
+    }
     return cnf.str();
 }
 
@@ -127,77 +110,51 @@ string MiniSAT::constraintthree() {
     stringstream cnf;
 
     // for G1: x1,x2,..,xn
-
-    cnf << 1 << " " << 2*no_vertices+1 << " 0\n";
-    for (int j = 2; j<=(no_vertices-k1); ++j) {
-        cnf << "-" << 2*no_vertices+j << " 0\n";
-    }
-    for (int i = 2; i < no_vertices; ++i) {
-        cnf << i << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+1) << " 0\n";
-        cnf << "-" << (2*no_vertices+(no_vertices-k1)*(i-2)+1) << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+1) << " 0\n";
+    if (no_vertices-k1>0){
+        cnf << 1 << " " << 2*no_vertices+1 << " 0\n";
         for (int j = 2; j<=(no_vertices-k1); ++j) {
-            cnf << i << " -" << (2*no_vertices+(no_vertices-k1)*(i-2)+j-1) << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+j) << " 0\n";
-            cnf << "-" << (2*no_vertices+(no_vertices-k1)*(i-2)+j) << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+j) << " 0\n";
+            cnf << "-" << 2*no_vertices+j << " 0\n";
         }
-        cnf << i << " -" << (2*no_vertices+(no_vertices-k1)*(i-2)+(no_vertices-k1)) << " 0\n";
+        for (int i = 2; i < no_vertices; ++i) {
+            cnf << i << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+1) << " 0\n";
+            cnf << "-" << (2*no_vertices+(no_vertices-k1)*(i-2)+1) << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+1) << " 0\n";
+            for (int j = 2; j<=(no_vertices-k1); ++j) {
+                cnf << i << " -" << (2*no_vertices+(no_vertices-k1)*(i-2)+j-1) << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+j) << " 0\n";
+                cnf << "-" << (2*no_vertices+(no_vertices-k1)*(i-2)+j) << " " << (2*no_vertices+(no_vertices-k1)*(i-1)+j) << " 0\n";
+            }
+            cnf << i << " -" << (2*no_vertices+(no_vertices-k1)*(i-2)+(no_vertices-k1)) << " 0\n";
+        }
+        cnf << no_vertices << " -" << ((2+(no_vertices-k1))*no_vertices-(no_vertices-k1)) << " 0\n";
+    } else if (no_vertices-k1==0) {
+        for (int i=1; i<=no_vertices; ++i){
+            cnf << "-" << i << " 0\n";
+        }
     }
-    cnf << no_vertices << " -" << ((2+(no_vertices-k1))*no_vertices-(no_vertices-k1)) << " 0\n";
-
+    
     // for G2: y1,y2,..,yn
-
-    cnf << (1+no_vertices) << " " << (2+(no_vertices-k1))*no_vertices+1 << " 0\n";
-    for (int j = 2; j<=(no_vertices-k2); ++j) {
-        cnf << "-" << (2+(no_vertices-k1))*no_vertices+j << " 0\n";
-    }
-    for (int i = 2; i < no_vertices; ++i) {
-        cnf << (i+no_vertices) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+1) << " 0\n";
-        cnf << "-" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+1) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+1) << " 0\n";
+    if (no_vertices-k2>0){
+        cnf << (1+no_vertices) << " " << (2+(no_vertices-k1))*no_vertices+1 << " 0\n";
         for (int j = 2; j<=(no_vertices-k2); ++j) {
-            cnf << (i+no_vertices) << " -" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+j-1) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+j) << " 0\n";
-            cnf << "-" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+j) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+j) << " 0\n";
+            cnf << "-" << (2+(no_vertices-k1))*no_vertices+j << " 0\n";
         }
-        cnf << (i+no_vertices) << " -" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+(no_vertices-k2)) << " 0\n";
+        for (int i = 2; i < no_vertices; ++i) {
+            cnf << (i+no_vertices) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+1) << " 0\n";
+            cnf << "-" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+1) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+1) << " 0\n";
+            for (int j = 2; j<=(no_vertices-k2); ++j) {
+                cnf << (i+no_vertices) << " -" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+j-1) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+j) << " 0\n";
+                cnf << "-" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+j) << " " << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-1)+j) << " 0\n";
+            }
+            cnf << (i+no_vertices) << " -" << ((2+(no_vertices-k1))*no_vertices+(no_vertices-k2)*(i-2)+(no_vertices-k2)) << " 0\n";
+        }
+        cnf << 2*no_vertices << " -" << ((2+(no_vertices-k1)+(no_vertices-k2))*no_vertices-(no_vertices-k2)) << " 0\n";
+    } else if (no_vertices-k2==0){
+        for (int i=1; i<=no_vertices; ++i){
+            cnf << "-" << (i+no_vertices) << " 0\n";
+        }
     }
-    cnf << 2*no_vertices << " -" << ((2+(no_vertices-k1)+(no_vertices-k2))*no_vertices-(no_vertices-k2)) << " 0\n";
+
     return cnf.str();
 }
-// string MiniSAT::constraintthree() { // for atmost k <= -- NEED TO MAKE CHANGES for atleast >=
-//     stringstream cnf;
-//     // for G1: x1,x2,..,xn
-//     cnf << "-" << 1 << " " << 2*no_vertices+1 << " 0\n";
-//     for (int j = 2; j<=k1; ++j) {
-//         cnf << "-" << 2*no_vertices+j << " 0\n";
-//     }
-//     for (int i = 2; i < no_vertices; ++i) {
-//         cnf << "-" << i << " " << (2*no_vertices+k1*(i-1)+1) << " 0\n";
-//         cnf << "-" << (2*no_vertices+k1*(i-2)+1) << " " << (2*no_vertices+k1*(i-1)+1) << " 0\n";
-//         for (int j = 2; j<=k1; ++j) {
-//             cnf << "-" << i << " -" << (2*no_vertices+k1*(i-2)+j-1) << " " << (2*no_vertices+k1*(i-1)+j) << " 0\n";
-//             cnf << "-" << (2*no_vertices+k1*(i-2)+j) << " " << (2*no_vertices+k1*(i-1)+j) << " 0\n";
-//         }
-//         cnf << "-" << i << " " << -(2*no_vertices+k1*(i-2)+k1) << " 0\n";
-//     }
-//     cnf << "-" << no_vertices << " " << -((2+k1)*no_vertices-k1) << " 0\n";
-//     // for G2: y1,y2,..,yn
-//     cnf << "-" << (1+no_vertices) << " " << (2+k1)*no_vertices+1 << " 0\n";
-//     for (int j = 2; j<=k1; ++j) {
-//         cnf << "-" << (2+k1)*no_vertices+j << " 0\n";
-//     }
-//     for (int i = 2; i <= no_vertices; ++i) {
-//         cnf << "-" << (i+no_vertices) << " " << ((2+k1)*no_vertices+k2*(i-1)+1) << " 0\n";
-//         cnf << "-" << ((2+k1)*no_vertices+k2*(i-2)+1) << " " << ((2+k1)*no_vertices+k2*(i-1)+1) << " 0\n";
-//         for (int j = 2; j<=k2; ++j) {
-//             cnf << "-" << (i+no_vertices) << " " << -((2+k1)*no_vertices+k2*(i-2)+j-1) << " " << ((2+k1)*no_vertices+k2*(i-1)+j) << " 0\n";
-//             cnf << "-" << ((2+k1)*no_vertices+k2*(i-2)+j) << " " << ((2+k1)*no_vertices+k2*(i-1)+j) << " 0\n";
-//         }
-//         cnf << "-" << i << " " << -((2+k1)*no_vertices+k2*(i-1)+k2) << " 0\n";
-//     }
-//     cnf << "-" << 2*no_vertices << " " << -((2+k1+k2)*no_vertices-k2) << " 0\n";
-//     return cnf.str();
-// }
-
-
-
 
 void MiniSAT::writeCNFtoFile(string filename) {
     string cnf1 = constraintOne();
