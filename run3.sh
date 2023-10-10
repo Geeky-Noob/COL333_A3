@@ -22,14 +22,14 @@ mapping_filename="$input_prefix.mapping"
 if [ -e "$graph_filename" ]; then
     # Read the first number from the file
     vertices=$(head -n 1 "$graph_filename" | awk '{print $1}')
-    echo "The first number is: $vertices"
+    # echo "The first number is: $vertices"
 else
     echo "File 'test.graph' does not exist."
 fi
 
 low=1
 high=$vertices
-echo "Vertices: $vertices"
+# echo "Vertices: $vertices"
 g++ problem2.cpp MiniSAT2.cpp -o subgraph_generator2
 
 g++ mapping.cpp -o mapping_generator
@@ -39,13 +39,13 @@ while [ $low -le $high ]; do
     mid=$((($low + $high) / 2))
     ./subgraph_generator2 $graph_filename $satinput_filename $mid
     minisat $satinput_filename $satoutput_filename
-    echo "Mid: $mid"
+    # echo "Mid: $mid"
 
     if [ -e "$satoutput_filename" ]; then
         read -r sat < "$satoutput_filename"
 
         if [ "$sat" == "SAT" ]; then
-            if [ $k -lt $mid ]; then
+            if [ $k -le $mid ]; then
                 k=$mid
                 ./mapping_generator $graph_filename $satoutput_filename $mapping_filename 2
             fi

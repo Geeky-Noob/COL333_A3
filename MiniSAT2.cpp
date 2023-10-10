@@ -11,21 +11,21 @@ using namespace std;
 MiniSAT2::MiniSAT2(string inputfilename, string satFilename, int k){
     
     readInInputFile(inputfilename);
-    cout << "Vertices: " << no_vertices << ", Edges: " << no_edges << endl;
+    // cout << "Vertices: " << no_vertices << ", Edges: " << no_edges << endl;
     
-    for (const auto& edge : edges) {
-        cout << edge.first << " " << edge.second << endl;
-    }
+    // for (const auto& edge : edges) {
+    //     cout << edge.first << " " << edge.second << endl;
+    // }
     
     buildGraph();
     
-    for (int i = 1; i < graph.size(); ++i) {
-        cout << "Node " << i << " is connected to: ";
-        for (const int& neighbor : graph[i]) {
-            cout << neighbor << " ";
-        }
-        cout << endl;
-    }
+    // for (int i = 1; i < graph.size(); ++i) {
+    //     cout << "Node " << i << " is connected to: ";
+    //     for (const int& neighbor : graph[i]) {
+    //         cout << neighbor << " ";
+    //     }
+    //     cout << endl;
+    // }
     
     writeCNFtoFile(satFilename, k);
 }
@@ -66,7 +66,7 @@ string MiniSAT2::constraintOne() {
         cnf << i << " ";
     }
     cnf << "0\n";
-
+    clauses=1;
     return cnf.str();
 }
 
@@ -87,6 +87,7 @@ string MiniSAT2::constrainttwo(int k) {
                 if (!connected) {
             
                     cnf << "-" << i << " -" <<  j << " 0\n";
+                    clauses++;
                 }
             }
         }
@@ -101,22 +102,29 @@ string MiniSAT2::constraintthree2(int k) {
     // for G1: x1,x2,..,xn
     if (no_vertices-k>0) {
         cnf << 1 << " " << no_vertices+1 << " 0\n";
+        clauses++;
         for (int j = 2; j<=(no_vertices-k); ++j) {
             cnf << "-" << no_vertices+j << " 0\n";
+            clauses++;
         }
         for (int i = 2; i < no_vertices; ++i) {
             cnf << i << " " << (no_vertices+(no_vertices-k)*(i-1)+1) << " 0\n";
             cnf << "-" << (no_vertices+(no_vertices-k)*(i-2)+1) << " " << (no_vertices+(no_vertices-k)*(i-1)+1) << " 0\n";
+            clauses = clauses+2;
             for (int j = 2; j<=(no_vertices-k); ++j) {
                 cnf << i << " -" << (no_vertices+(no_vertices-k)*(i-2)+j-1) << " " << (no_vertices+(no_vertices-k)*(i-1)+j) << " 0\n";
                 cnf << "-" << (no_vertices+(no_vertices-k)*(i-2)+j) << " " << (no_vertices+(no_vertices-k)*(i-1)+j) << " 0\n";
+                clauses = clauses+2;
             }
             cnf << i << " -" << (no_vertices+(no_vertices-k)*(i-2)+(no_vertices-k)) << " 0\n";
+            clauses++;
         }
         cnf << no_vertices << " -" << ((1+(no_vertices-k))*no_vertices-(no_vertices-k)) << " 0\n";
+        clauses++;
     } else if (no_vertices-k==0) {
         for (int i=1; i<=no_vertices; ++i){
-            cnf << "-" << i << " 0\n";
+            cnf << i << " 0\n";
+            clauses++;
         }
     }
 
@@ -135,8 +143,11 @@ void MiniSAT2::writeCNFtoFile(string filename, int k) {
         cerr << "Failed to open the file for writing." << std::endl;
         exit(0);
     }
+
+    int variables = no_vertices*(1+no_vertices-k) - no_vertices + k;
+
     satInputFile << "c Here is a comment." << endl;
-    satInputFile << "p cnf 14 14\n";
+    satInputFile << "p cnf " << variables << " " << clauses << endl;
     // satInputFile << "p cnf " << no_vertices*((2*no_vertices-k1)+(no_vertices-k2)+2) << " " << (2*no_vertices) + (2*no_vertices*(no_vertices-k1)+no_vertices-3*(no_vertices-k1)-1) + (2*no_vertices*(no_vertices-k2)+no_vertices-3*(no_vertices-k2)-1) << endl;
     satInputFile << cnfFormula;
     satInputFile.close();

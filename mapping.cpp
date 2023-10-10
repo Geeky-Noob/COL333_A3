@@ -110,6 +110,7 @@ int main(int argc, char* argv[])
                     if (x<=v){
                         if (var > 0 && c1<=k){
                             c1++;
+                            cout << "Var: " << var << "\n";
                             G << var << " ";
                         }
                     } else {

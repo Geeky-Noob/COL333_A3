@@ -13,6 +13,7 @@ class MiniSAT2 {
     int no_edges;
     vector<pair<int, int>> edges;
     vector<vector<int>> graph;
+    int clauses=0;
     
     public:
     MiniSAT2(string inputfilename, string satFilename, int k);  

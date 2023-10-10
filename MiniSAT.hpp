@@ -15,6 +15,7 @@ class MiniSAT {
     int k2;
     vector<pair<int, int>> edges;
     vector<vector<int>> graph;
+    int clauses=0;
     
     public:
     MiniSAT(string inputfilename, string satFilename);  
@@ -24,4 +25,5 @@ class MiniSAT {
     string constraintOne();
     string constrainttwo();
     string constraintthree();
+    string constraintthree2(int k1);
 };
